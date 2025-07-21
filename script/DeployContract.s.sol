@@ -6,8 +6,6 @@ import "../src/XMoney.sol";
 import "../src/XVault.sol";
 import "forge-std/console2.sol";
 
-// forge script script/DeployContract.s.sol --broadcast --rpc-url customNetwork
-
 contract DeployContract is Script {
     function run() external {
         // Get deployer private key from environment variables

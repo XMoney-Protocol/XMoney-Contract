@@ -7,8 +7,6 @@ import "../src/XVault.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
-// forge script script/TransferToken.s.sol --broadcast --rpc-url customNetwork
-
 contract TransferToken is Script {
     function run() external {
         // Get configuration from environment variables

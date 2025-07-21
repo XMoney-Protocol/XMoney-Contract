@@ -10,7 +10,7 @@ import "./interfaces/IXID.sol";
  * @title XVault
  * @dev A vault contract for storing funds for unregistered XID users.
  * Users can withdraw their funds after registering their XID.
- * Supports storage and withdrawal of native tokens and ERC20 tokens.
+ * Supports storage and withdrawal of native tokens and BEP-20 tokens.
  */
 contract XVault is Ownable {
     using SafeERC20 for IERC20;
@@ -97,7 +97,7 @@ contract XVault is Ownable {
     }
 
     /**
-     * @notice Deposits ERC20 tokens for a specific username
+     * @notice Deposits BEP-20 tokens for a specific username
      * @param username The username to deposit for
      * @param token The token address to deposit
      * @param amount The amount of tokens to deposit
@@ -359,7 +359,7 @@ contract XVault is Ownable {
         // Transfer net amount to user
         IERC20(token).safeTransfer(msg.sender, netAmount);
 
-        // Accumulate ERC20 token fees
+        // Accumulate BEP-20 token fees
         if (fee > 0) {
             accumulatedTokenFees[token] += fee;
         }
@@ -387,7 +387,7 @@ contract XVault is Ownable {
     /**
      * @notice Claim accumulated fees for a specific token
      * @dev Only callable by the fee receiver
-     * @param token ERC20 token contract address
+     * @param token BEP-20 token contract address
      */
     function claimTokenFees(address token) external {
         require(
@@ -409,7 +409,7 @@ contract XVault is Ownable {
     /**
      * @notice Claim accumulated fees for multiple tokens
      * @dev Only callable by the fee receiver
-     * @param tokens Array of ERC20 token contract addresses
+     * @param tokens Array of BEP-20 token contract addresses
      */
     function claimMultipleTokenFees(address[] calldata tokens) external {
         require(
@@ -457,7 +457,7 @@ contract XVault is Ownable {
 
     /**
      * @notice Get accumulated fees for a specific token
-     * @param token ERC20 token contract address
+     * @param token BEP-20 token contract address
      * @return uint256 Amount of accumulated fees for the token
      */
     function getAccumulatedTokenFees(

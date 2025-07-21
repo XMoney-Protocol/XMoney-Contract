@@ -7,7 +7,6 @@ import "../src/XVault.sol";
 import "../src/interfaces/IXVault.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-// TODO: 测试转账事件触发
 
 // Mock ERC20 token for testing
 contract MockToken is ERC20 {
@@ -290,7 +289,7 @@ contract XMoneyTest is Test {
         vm.prank(mockController);
         xid.mint(user1, username, 1);
 
-        // Deposit ETH to vault
+        // Deposit BNB to vault
         vm.prank(user1);
         xMoney.transferNativeToken{value: amount}(username);
 
@@ -344,7 +343,7 @@ contract XMoneyTest is Test {
             totalAmount += 0.002 ether; // Total 0.002 ether per user pair
         }
 
-        // Ensure sender has sufficient ETH
+        // Ensure sender has sufficient BNB
         vm.deal(user1, totalAmount + 1 ether);
 
         // Execute batch transfer and measure gas
@@ -487,13 +486,13 @@ contract XMoneyTest is Test {
             directAmounts
         );
 
-        // Verify testuser received ETH directly (minus 1% fee)
+        // Verify testuser received BNB directly (minus 1% fee)
         uint256 expectedDirectTransfer = (20 ether * (10000 - FEE_RATE)) /
             10000;
         uint256 expectedDirectFee = (20 ether * FEE_RATE) / 10000;
         assertEq(testuser.balance, expectedDirectTransfer);
 
-        // Verify other users' ETH went into vault (no fee)
+        // Verify other users' BNB went into vault (no fee)
         assertEq(xVault.getNativeTokenBalance("elonmusk"), 20 ether);
         assertEq(xVault.getNativeTokenBalance("jack"), 20 ether);
         assertEq(xVault.getNativeTokenBalance("donald"), 20 ether);
@@ -518,7 +517,7 @@ contract XMoneyTest is Test {
         // Calculate expected amount (10% fee charged for vault withdrawal)
         uint256 expectedAmount = (20 ether * (10000 - 1000)) / 10000;
 
-        // Verify elon received correct amount (18 ETH, minus 10% fee)
+        // Verify elon received correct amount (18 BNB, minus 10% fee)
         assertEq(elon.balance - elonBalanceBefore, expectedAmount);
 
         // Verify elon's vault balance is cleared
@@ -560,7 +559,7 @@ contract XMoneyTest is Test {
         mockToken.approve(address(xMoney), 100 * 10 ** 18);
         xMoney.transferToken(username, 100 * 10 ** 18, address(mockToken));
 
-        // Verify ETH balance
+        // Verify BNB balance
         uint256 nativeTokenBalance = xVault.getNativeTokenBalance(username);
         assertEq(nativeTokenBalance, 1 ether);
 
@@ -576,7 +575,7 @@ contract XMoneyTest is Test {
     function testZeroValueTransfers() public {
         string memory username = "user1";
 
-        // Test zero value ETH transfer
+        // Test zero value BNB transfer
         vm.prank(user1);
         vm.expectRevert("XMoney: Amount must be greater than 0");
         xMoney.transferNativeToken{value: 0}(username);
@@ -806,7 +805,7 @@ contract XMoneyTest is Test {
         vm.prank(mockController);
         xid.mint(user1, username, 1);
 
-        // Transfer to accumulate ETH fees
+        // Transfer to accumulate BNB fees
         vm.prank(user2);
         xMoney.transferNativeToken{value: amount}(username);
 

@@ -239,7 +239,7 @@ contract XVaultTest is Test {
         usernameHashes[0] = keccak256(bytes(usernames[0]));
         usernameHashes[1] = keccak256(bytes(usernames[1]));
 
-        // Test ETH batch deposit events
+        // Test BNB batch deposit events
         vm.recordLogs();
         vm.deal(ALICE, 3 ether);
         vm.prank(ALICE);
@@ -301,7 +301,7 @@ contract XVaultTest is Test {
         uint256 fee = (depositAmount * FEE_RATE) / 10000;
         uint256 expectedAmount = depositAmount - fee;
 
-        // Test ETH withdrawal event
+        // Test BNB withdrawal event
         vm.expectEmit(true, false, false, true);
         emit NativeTokenWithdrawn(usernameHash, TEST_USERNAME, ALICE, expectedAmount);
         vault.withdrawNativeToken(TEST_USERNAME);
@@ -413,7 +413,7 @@ contract XVaultTest is Test {
     }
 
     function testWithdrawAll() public {
-        // Deposit some ETH and tokens
+        // Deposit some BNB and tokens
         vm.deal(ALICE, 1 ether);
         vm.startPrank(ALICE);
         vault.depositNativeToken{value: 1 ether}(TEST_USERNAME);
@@ -572,11 +572,11 @@ contract XVaultTest is Test {
     function testClaimNativeTokenFees() public {
         uint256 depositAmount = 1 ether;
 
-        // First deposit some ETH
+        // First deposit some BNB
         vm.prank(ALICE);
         vault.depositNativeToken{value: depositAmount}(TEST_USERNAME);
 
-        // Withdraw ETH and generate fees
+        // Withdraw BNB and generate fees
         vm.prank(ALICE);
         vault.withdrawNativeToken(TEST_USERNAME);
 

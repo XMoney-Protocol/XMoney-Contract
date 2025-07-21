@@ -5,8 +5,6 @@ import "forge-std/Script.sol";
 import "forge-std/console2.sol";
 import "../src/XMoney.sol";
 
-// forge script script/TransferEth.s.sol --broadcast --rpc-url base_sepolia
-
 contract TransferNativeToken is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");

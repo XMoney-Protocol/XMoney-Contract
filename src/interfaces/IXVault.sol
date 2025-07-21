@@ -14,9 +14,9 @@ interface IXVault {
      */
     function depositNativeToken(string memory username) external payable;
     /**
-     * @notice Deposits ERC20 tokens for a specific username
+     * @notice Deposits BEP-20 tokens for a specific username
      * @param username The username to deposit funds for
-     * @param token The ERC20 token contract address
+     * @param token The BEP-20 token contract address
      * @param amount The amount of tokens to deposit
      * @dev Funds are stored until the user registers their XID
      */

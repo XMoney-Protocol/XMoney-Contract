@@ -15,7 +15,7 @@ interface IXMoney {
     
     /**
      * @notice Get accumulated fees for a specific token
-     * @param token ERC20 token contract address
+     * @param token BEP-20 token contract address
      * @return uint256 Amount of accumulated token fees
      */
     function getAccumulatedTokenFees(address token) external view returns (uint256);
@@ -28,14 +28,14 @@ interface IXMoney {
     
     /**
      * @notice Claim accumulated fees for a specific token
-     * @param token ERC20 token contract address
+     * @param token BEP-20 token contract address
      * @dev Only callable by the fee receiver
      */
     function claimTokenFees(address token) external;
     
     /**
      * @notice Claim accumulated fees for multiple tokens
-     * @param tokens Array of ERC20 token contract addresses
+     * @param tokens Array of BEP-20 token contract addresses
      * @dev Only callable by the fee receiver
      */
     function claimMultipleTokenFees(address[] calldata tokens) external;
