@@ -13,8 +13,8 @@ By combining identity and onchain payments, XMoney unlocks a powerful new toolse
 
 ## Contract Addresses (BSC Mainnet)
 
-- **XMoney Contract**: `0xaEd18172E5F0a5b303928b13890b3a01BDa1b143`
-- **XVault Contract**: `0xBeeb32C59b70F2d41b5Fcf64e6A3Da777eB7317f`
+- **XMoney Contract**: `0x6efC8Da0F812aA83A697cF2737B0dFAE8a9B9480`
+- **XVault Contract**: `0xf09455165668218E13298cA14827f1FaEb0BBdee`
 
 ## Links
 

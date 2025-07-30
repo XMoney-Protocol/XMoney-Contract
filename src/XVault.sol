@@ -10,7 +10,7 @@ import "./interfaces/IXID.sol";
  * @title XVault
  * @dev A vault contract for storing funds for unregistered XID users.
  * Users can withdraw their funds after registering their XID.
- * Supports storage and withdrawal of native tokens and BEP-20 tokens.
+ * Supports storage and withdrawal of native tokens and ERC20 tokens.
  */
 contract XVault is Ownable {
     using SafeERC20 for IERC20;
@@ -20,8 +20,10 @@ contract XVault is Ownable {
     mapping(bytes32 => uint256) public nativeTokenBalances;
     /// @notice Mapping of username hash to token address to token balance
     mapping(bytes32 => mapping(address => uint256)) public tokenBalances;
-    /// @notice Fee rate in basis points (1000 = 10%)
-    uint256 public feeRate = 1000;
+    /// @notice Fee rate in basis points (500 = 5%)
+    uint256 public feeRate = 500;
+    /// @notice Maximum allowed fee rate (8% = 800 basis points)
+    uint256 public constant MAX_FEE_RATE = 800;
     /// @notice Address that receives the fees
     address public feeReceiver;
     /// @notice Mapping of token address to accumulated fees
@@ -97,7 +99,7 @@ contract XVault is Ownable {
     }
 
     /**
-     * @notice Deposits BEP-20 tokens for a specific username
+     * @notice Deposits ERC20 tokens for a specific username
      * @param username The username to deposit for
      * @param token The token address to deposit
      * @param amount The amount of tokens to deposit
@@ -263,6 +265,7 @@ contract XVault is Ownable {
      * @param feeRate_ The new fee rate (100 = 1%)
      */
     function setFeeRate(uint256 feeRate_) external onlyOwner {
+        require(feeRate_ <= MAX_FEE_RATE, "XVault: Fee rate exceeds maximum");
         uint256 oldRate = feeRate;
         feeRate = feeRate_;
         emit FeeRateUpdated(oldRate, feeRate_);
@@ -359,7 +362,7 @@ contract XVault is Ownable {
         // Transfer net amount to user
         IERC20(token).safeTransfer(msg.sender, netAmount);
 
-        // Accumulate BEP-20 token fees
+        // Accumulate ERC20 token fees
         if (fee > 0) {
             accumulatedTokenFees[token] += fee;
         }
@@ -387,7 +390,7 @@ contract XVault is Ownable {
     /**
      * @notice Claim accumulated fees for a specific token
      * @dev Only callable by the fee receiver
-     * @param token BEP-20 token contract address
+     * @param token ERC20 token contract address
      */
     function claimTokenFees(address token) external {
         require(
@@ -409,7 +412,7 @@ contract XVault is Ownable {
     /**
      * @notice Claim accumulated fees for multiple tokens
      * @dev Only callable by the fee receiver
-     * @param tokens Array of BEP-20 token contract addresses
+     * @param tokens Array of ERC20 token contract addresses
      */
     function claimMultipleTokenFees(address[] calldata tokens) external {
         require(
@@ -457,7 +460,7 @@ contract XVault is Ownable {
 
     /**
      * @notice Get accumulated fees for a specific token
-     * @param token BEP-20 token contract address
+     * @param token ERC20 token contract address
      * @return uint256 Amount of accumulated fees for the token
      */
     function getAccumulatedTokenFees(
