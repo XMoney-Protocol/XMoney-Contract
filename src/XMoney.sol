@@ -10,7 +10,7 @@ import "./interfaces/IXVault.sol";
 
 /**
  * @title XMoney
- * @dev Handles XID-based transfer functionality, supporting single and batch transfers of BNB and ERC20 tokens
+ * @dev Handles XID-based transfer functionality, supporting single and batch transfers of native tokens and ERC20 tokens
  * If the recipient hasn't registered an XID, funds will be stored in XVault contract for claiming
  * Direct transfers incur a fee, vault deposits are fee-free
  */
@@ -27,7 +27,7 @@ contract XMoney is ReentrancyGuard, Ownable {
     /// @notice Maximum allowed fee rate (3% = 300 basis points)
     uint256 public constant MAX_FEE_RATE = 300;
 
-    /// @notice Emitted when BNB is transferred from `from` to recipient with username `toUsername`.
+    /// @notice Emitted when native token is transferred from `from` to recipient with username `toUsername`.
     event NativeTokenTransferred(
         address indexed from,
         string indexed toUsername,
@@ -44,7 +44,7 @@ contract XMoney is ReentrancyGuard, Ownable {
         uint256 fee
     );
 
-    /// @notice Emitted when BNB is batch transferred from `from` to multiple recipients.
+    /// @notice Emitted when native token is batch transferred from `from` to multiple recipients.
     event BatchNativeTokenTransferred(
         address indexed from,
         string[] toUsernames,
@@ -83,7 +83,7 @@ contract XMoney is ReentrancyGuard, Ownable {
     /// @notice Mapping to track accumulated fees for ERC20 tokens
     mapping(address => uint256) public accumulatedTokenFees;
 
-    /// @notice Mapping to track accumulated fees for BNB
+    /// @notice Mapping to track accumulated fees for native token
     uint256 public accumulatedNativeTokenFees;
 
     /**
@@ -103,7 +103,7 @@ contract XMoney is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Transfer BNB to a specified XID user
+     * @notice Transfer native token to a specified XID user
      * @dev If the recipient has registered an XID, a fee is deducted before transferring; if not, the full amount is deposited into vault
      * @param toUsername Recipient's XID username
      */
@@ -122,16 +122,16 @@ contract XMoney is ReentrancyGuard, Ownable {
                 uint256 fee = (msg.value * feeRate) / 10000;
                 uint256 transferAmount = msg.value - fee;
 
-                // Accumulate BNB fees
+                // Accumulate native token fees
                 if (fee > 0) {
                     accumulatedNativeTokenFees += fee;
                 }
 
-                // Use a low-level call to transfer BNB directly
+                // Use a low-level call to transfer native token directly
                 (bool success, ) = payable(recipient).call{
                     value: transferAmount
                 }("");
-                require(success, "XMoney: BNB transfer failed");
+                require(success, "XMoney: Native token transfer failed");
 
                 emit NativeTokenTransferred(
                     msg.sender,
@@ -141,7 +141,7 @@ contract XMoney is ReentrancyGuard, Ownable {
                 );
             }
         } else {
-            // If the recipient has not registered an XID, deposit BNB into the vault contract
+            // If the recipient has not registered an XID, deposit native token into the vault contract
             vault.depositNativeToken{value: msg.value}(toUsername);
             emit NativeTokenTransferred(msg.sender, toUsername, msg.value, 0);
         }
@@ -199,7 +199,7 @@ contract XMoney is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Batch transfer BNB to multiple XID users (handled separately for registered and unregistered users)
+     * @notice Batch transfer native token to multiple XID users (handled separately for registered and unregistered users)
      * @dev Charges a fee for registered users, deposits full amount into vault for unregistered users
      * @param toUsernames Array of unregistered XID usernames
      * @param vaultAmounts Array of amounts deposited to vault (unregistered users)
@@ -238,7 +238,7 @@ contract XMoney is ReentrancyGuard, Ownable {
         // Calculate the fee for registered addresses
         uint256 totalFee = (directTotal * feeRate) / 10000;
 
-        // Accumulate BNB fees
+        // Accumulate native token fees
         if (totalFee > 0) {
             accumulatedNativeTokenFees += totalFee;
         }
@@ -325,7 +325,7 @@ contract XMoney is ReentrancyGuard, Ownable {
         );
     }
 
-    /// @dev Internal function to process direct BNB transfers
+    /// @dev Internal function to process direct native token transfers
     function _processDirectNativeTokenTransfers(
         address[] calldata toAddresses,
         uint256[] calldata directAmounts
@@ -338,7 +338,7 @@ contract XMoney is ReentrancyGuard, Ownable {
             (bool success, ) = payable(toAddresses[i]).call{
                 value: adjustedAmount
             }("");
-            require(success, "XMoney: BNB transfer failed");
+            require(success, "XMoney: Native token transfer failed");
             unchecked {
                 ++i;
             }
@@ -488,7 +488,7 @@ contract XMoney is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Claim accumulated fees for BNB
+     * @notice Claim accumulated fees for native token
      * @dev Only callable by the fee receiver
      */
     function claimNativeTokenFees() external {
@@ -497,14 +497,14 @@ contract XMoney is ReentrancyGuard, Ownable {
             "XMoney: Only fee receiver can claim fees"
         );
         uint256 amount = accumulatedNativeTokenFees;
-        require(amount > 0, "XMoney: No BNB fees to claim");
+        require(amount > 0, "XMoney: No native token fees to claim");
 
         // Reset accumulated fees
         accumulatedNativeTokenFees = 0;
 
         // Transfer accumulated fees to fee receiver
         (bool success, ) = payable(feeReceiver).call{value: amount}("");
-        require(success, "XMoney: BNB fee transfer failed");
+        require(success, "XMoney: Native token fee transfer failed");
 
         emit FeesClaimed(address(0), amount);
     }
@@ -522,14 +522,14 @@ contract XMoney is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Get accumulated fees for BNB
+     * @notice Get accumulated fees for native token
      * @dev Only callable by anyone
-     * @return uint256 Amount of accumulated fees for BNB
+     * @return uint256 Amount of accumulated fees for native token
      */
     function getAccumulatedNativeTokenFees() external view returns (uint256) {
         return accumulatedNativeTokenFees;
     }
 
-    /// @notice Allows the contract to receive BNB
+    /// @notice Allows the contract to receive native token
     receive() external payable {}
 }
